@@ -27,3 +27,5 @@ frontend/*.sw?
 # Backend directories
 /backend/node_modules
 /backend/.env
+
+/generated/prisma
