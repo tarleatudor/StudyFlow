@@ -12,3 +12,37 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Activity {
+  id Int @id @default(autoincrement())
+  title String
+  desciption String?
+
+  //unique access code (6 digits)
+  code String @unique
+
+  //activity duration
+  duration Int
+
+  //activity start timestamp (synchronized with WorldTimeAPI)
+  startTime DateTime @default(now())
+
+  //relationships with feedbacks received
+  feedbacks Feedback[]
+
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id Int @id @default(autoincrement())
+
+  //emoji tyoe
+  emojiType String
+
+  //exact time when emoji was sent
+  timestamp DateTime @default(now())
+
+  //relationship with specified activity
+  activityId Int
+  activity Activity @relation(fields: [activityId], references: [id])
+}
