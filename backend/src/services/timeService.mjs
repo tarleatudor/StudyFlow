@@ -1,5 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import { AppError, catchAsync } from "../utils/errorHandler.mjs";
 
 dotenv.config();
 
@@ -7,11 +8,6 @@ const WORLD_TIME_URL =
   process.env.WORLD_TIME_URL ||
   "http://worldtimeapi.org/api/timezone/Europe/Bucharest";
 
-
-/**
- * Obtains official WorldTimeAPI date or current system date as fallback
- * @returns {Promise<Date>}
- */
 export const getCurrentTime = async () => {
   try {
     const response = await axios.get(WORLD_TIME_URL);
@@ -22,18 +18,13 @@ export const getCurrentTime = async () => {
   }
 };
 
-// 
-
-/**
- * Verifies if an activity is still valid
- * @param {Date} startTime
- * @param {number} durationInMinutes
- * @returns {Promise<boolean>}
- */
-
-export const isActivityActive = async (startTime, durationInMinutes) => {
+export const getActivityStatus = async (scheduledDate, durationInMinutes) => {
   const now = await getCurrentTime();
-  const endTime = new Date(startTime.getTime() + durationInMinutes * 60000); // date construction in miliseconds
+  const start = new Date(scheduledDate);
+  const durationInMs = durationInMinutes * 60 * 1000;
+  const end = new Date(start.getTime() + durationInMs);
 
-  return now <= endTime;
+  if (now < start) return "UPCOMING";
+  if (now >= start && now <= end) return "ACTIVE";
+  return "EXPIRED";
 };
